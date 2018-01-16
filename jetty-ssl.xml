@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+    <Call name="addConnector">
+        <Arg>
+            <New id="sslConnector" class="org.eclipse.jetty.server.ServerConnector">
+                <Arg name="server"><Ref refid="Server" /></Arg>
+                <Arg name="factories"><Array type="org.eclipse.jetty.server.ConnectionFactory"></Array></Arg>
+                <Set name="port"><Property name="jetty.ssl.port" deprecated="ssl.port" default="8443" /></Set>
+            </New>
+        </Arg>
+    </Call>
+
+    <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <Arg>
+            <New class="org.eclipse.jetty.server.HttpConfiguration">
+                <Set name="secureScheme">https</Set>
+                <Set name="securePort"><Property name="jetty.secure.port" default="8443" /></Set>
+                <!--Set name="outputBufferSize">32768</Set>
+                <Set name="requestHeaderSize">8192</Set>
+                <Set name="responseHeaderSize">8192</Set>
+                <Set name="sendServerVersion">true</Set>
+                <Set name="sendDateHeader">false</Set>
+                <Set name="headerCacheSize">512</Set-->
+            </New>
+        </Arg>
+        <Call name="addCustomizer">
+            <Arg>
+                <New class="org.eclipse.jetty.server.SecureRequestCustomizer">
+                    <Arg name="sniHostCheck" type="boolean"><Property name="jetty.ssl.sniHostCheck" default="true"/></Arg>
+                    <Arg name="stsMaxAgeSeconds" type="int"><Property name="jetty.ssl.stsMaxAgeSeconds" default="-1"/></Arg>
+                    <Arg name="stsIncludeSubdomains" type="boolean"><Property name="jetty.ssl.stsIncludeSubdomains" default="false"/></Arg>
+                </New>
+            </Arg>
+        </Call>
+    </New>
+
+</Configure>

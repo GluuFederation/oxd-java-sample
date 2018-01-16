@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<Configure id="sslConnector" class="org.eclipse.jetty.server.ServerConnector">
+
+    <Call name="addIfAbsentConnectionFactory">
+        <Arg>
+            <New class="org.eclipse.jetty.server.SslConnectionFactory">
+                <Arg name="next">http/1.1</Arg>
+                <Arg name="sslContextFactory">
+                    <New class="org.eclipse.jetty.util.ssl.SslContextFactory">
+                        <Set name="KeyStorePath"><Property name="jetty.sslContext.keyStorePath" default="keystore"/></Set>
+                        <Set name="KeyStoreType"><Property name="jetty.sslContext.keyStoreType" default="JKS"/></Set>
+                        <Set name="KeyStorePassword"><Property name="jetty.sslContext.keyStorePassword" default="oxtrust"/></Set>
+                        <Set name="KeyManagerPassword"><Property name="jetty.sslContext.keyManagerPassword" default="oxtrust"/></Set>
+                    </New>
+                </Arg>
+            </New>
+        </Arg>
+    </Call>
+
+    <Call name="addConnectionFactory">
+        <Arg>
+            <New class="org.eclipse.jetty.server.HttpConnectionFactory">
+                <Arg name="config"><Ref refid="sslHttpConfig" /></Arg>
+                <!--Arg name="compliance">
+                    <Call class="org.eclipse.jetty.http.HttpCompliance" name="valueOf"><Arg><Property name="jetty.http.compliance" default="RFC7230"/></Arg></Call>
+                </Arg-->
+            </New>
+        </Arg>
+    </Call>
+
+</Configure>
