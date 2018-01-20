@@ -20,6 +20,8 @@
     </repositories>
 
     <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <oxd.version>3.1.1.Final</oxd.version>
         <jetty.version>9.4.2.v20170220</jetty.version>
     </properties>

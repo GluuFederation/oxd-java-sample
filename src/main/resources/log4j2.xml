@@ -14,7 +14,7 @@
 
     </Appenders>
     <Loggers>
-        <Logger name="org.xdi" level="TRACE">
+        <Logger name="org.xdi.oxd.sample" level="TRACE">
             <AppenderRef ref="Console" />
         </Logger>
         <!--Root level="TRACE">
