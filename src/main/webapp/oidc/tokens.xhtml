@@ -1,0 +1,59 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="title">OpenID connect Authorization Code Flow</ui:define>
+
+    <ui:define name="header">
+        <div class="col-md-11">
+            <h1 align="center">
+                <c:choose>
+                    <c:when test="#{empty param.error and sessionUtil.tokenStep}">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</c:when>
+                    <c:otherwise>Oops</c:otherwise>
+                </c:choose>
+            </h1>
+        </div>
+        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+    </ui:define>
+
+    <ui:define name="content">
+        <ui:fragment rendered="#{not empty oxdConfig.oxdId}">
+
+            <c:set var="step" value="#{sessionUtil.stage.step}" />
+
+            <c:choose>
+                <c:when test="#{sessionUtil.tokenStep}">
+                    <c:choose>
+                        <c:when test="#{empty param.error}">
+
+                            <div class="well">
+                                <p>
+                                    You have gone through steps 1 - #{step-1}.
+                                </p>
+                            </div>
+                            <ui:include src="tokens_inner.xhtml" />
+
+                        </c:when>
+                        <c:otherwise>
+                            <div class="lead bg-warning" align="center" style="padding:15px">
+                                There was an error processing this step at the authorization server.
+                            </div>
+                            <p>These are some details:</p>
+                            <p>
+                                <i>error:</i> #{param.error}<br />
+                                <i>description:</i> #{param.error_description}
+                            </p>
+                        </c:otherwise>
+                    </c:choose>
+
+                </c:when>
+                <c:otherwise>
+                    <p align="center" class="bg-danger">
+                        This page does not match the current stage of the flow.<br/>
+                        To start all over again, please click <a href="pre_authz.xhtml">here</a>.
+                    </p>
+                </c:otherwise>
+            </c:choose>
+        </ui:fragment>
+    </ui:define>
+
+</ui:composition>

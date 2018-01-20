@@ -25,15 +25,15 @@ public class OxdConfig {
 
     private String redirectUri;
     private String postLogoutUri;
+    private String acrValues;
+    private String scopes;
 
     private Logger logger = LogManager.getLogger(getClass());
 
     public OxdConfig(){
 
-        opHost=System.getProperty("oxd.server.op-host");
-
-        String _host=System.getProperty("oxd.server.host");
-        host=_host==null ? "localhost" : _host;
+        opHost=System.getProperty("oxd.server.op-host", null);
+        host=System.getProperty("oxd.server.host", "localhost");
 
         String _port=System.getProperty("oxd.server.port");
         try{
@@ -41,11 +41,27 @@ public class OxdConfig {
         }
         catch (Exception e){
             port=8098;
-            logger.error("An error occurred: {}", e.getMessage());
+            logger.error(e.getMessage(), e);
             logger.warn("Defaulting oxd port to {}", port);
         }
 
         useHttpsExtension=System.getProperty("oxd.server.isExtension")!=null;
+        acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
+        scopes=System.getProperty("oxd.server.scopes", "openid, uma_protection");
+
+    }
+
+    static String getServerRoot(){
+
+        StringBuilder uri=new StringBuilder();
+        uri.append("https://").append(System.getProperty("oxd.sample.host","localhost"));
+
+        String serverPort=System.getProperty("oxd.sample.port","8463");
+
+        if (!serverPort.equals("443"))
+            uri.append(":").append(serverPort);
+
+        return uri.toString();
 
     }
 
@@ -53,32 +69,16 @@ public class OxdConfig {
         return opHost;
     }
 
-    public void setOpHost(String opHost) {
-        this.opHost = opHost;
-    }
-
     public String getHost() {
         return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
     }
 
     public int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
     public boolean isUseHttpsExtension() {
         return useHttpsExtension;
-    }
-
-    public void setUseHttpsExtension(boolean useHttpsExtension) {
-        this.useHttpsExtension = useHttpsExtension;
     }
 
     public String getOxdId() {
@@ -97,6 +97,38 @@ public class OxdConfig {
         return clientName;
     }
 
+    public String getPostLogoutUri() {
+        return postLogoutUri;
+    }
+
+    public String getAcrValues() {
+        return acrValues;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public String getScopes() {
+        return scopes;
+    }
+
+    public void setOpHost(String opHost) {
+        this.opHost = opHost;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setUseHttpsExtension(boolean useHttpsExtension) {
+        this.useHttpsExtension = useHttpsExtension;
+    }
+
     public void setOxdId(String oxdId) {
         this.oxdId = oxdId;
     }
@@ -113,20 +145,20 @@ public class OxdConfig {
         this.clientName = clientName;
     }
 
-    public String getRedirectUri() {
-        return redirectUri;
-    }
-
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
     }
 
-    public String getPostLogoutUri() {
-        return postLogoutUri;
-    }
-
     public void setPostLogoutUri(String postLogoutUri) {
         this.postLogoutUri = postLogoutUri;
+    }
+
+    public void setAcrValues(String acrValues) {
+        this.acrValues = acrValues;
+    }
+
+    public void setScopes(String scopes) {
+        this.scopes = scopes;
     }
 
     @Override

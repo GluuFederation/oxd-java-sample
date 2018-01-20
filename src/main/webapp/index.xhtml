@@ -1,0 +1,27 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <ui:define name="title">oxd-java sample webapp</ui:define>
+
+    <ui:define name="header">
+        <h1 align="center">Welcome to oxd-java sample webapp</h1>
+        <h5 align="center">This app demonstrates how to integrate oxd-java<sup>*</sup> into a standard web application.</h5>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div class="well">
+            <p>
+                This app is split into 3 sections:
+                <ol>
+                    <li>Authentication using OpenID connect. A workflow that starts <a href="oidc/index.xhtml">here</a>.</li>
+                    <li>UMA</li>
+                    <li>A <a href="settings.xhtml">settings</a> page where you can see ...</li>
+                </ol>
+            </p>
+        </div>
+        <p class="small">
+            (*) oxd-java is a java lib that facilitates authentication of users against an OpenID Connect identity provider such as Gluu Server.
+        </p>
+
+    </ui:define>
+
+</ui:composition>

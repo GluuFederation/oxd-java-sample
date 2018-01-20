@@ -1,0 +1,57 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="title">OpenID connect Authorization Code Flow</ui:define>
+
+    <ui:define name="header">
+        <div class="col-md-11">
+            <h1 align="center">
+                <c:choose>
+                    <c:when test="#{sessionUtil.isCurrent('PRE_AUTHZ_URL')}">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</c:when>
+                    <c:otherwise>Oops</c:otherwise>
+                </c:choose>
+            </h1>
+        </div>
+        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+    </ui:define>
+
+    <ui:define name="content">
+        <ui:fragment rendered="#{not empty oxdConfig.oxdId}">
+
+            <div class="row">
+                <c:choose>
+                    <c:when test="#{sessionUtil.isCurrent('PRE_AUTHZ_URL')}">
+
+                        <p>
+                            <br />
+                            The following authorization URL was obtained via oxd-java to start the authentication request:
+                        </p>
+
+                        <p><code>#{sessionUtil.authorizationUrl}</code></p>
+
+                        <p>
+                            <br />
+                            Click the button to be redirected to the URL above. This will execute steps 2-3.
+                        </p>
+
+                        <div class="col-md-offset-1">
+                            <h:form>
+                                <h:commandButton value=" Go... " styleClass="btn btn-primary" action="#{sessionUtil.goAuthenticate()}"/>
+                            </h:form>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <p align="center" class="bg-danger">
+                            This page does not match the current stage of the flow. <br/>
+                            <c:if test="#{sessionUtil.loggedIn}">
+                                To start all over again, please <a href="#">logout</a>.
+                            </c:if>
+                        </p>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+        </ui:fragment>
+    </ui:define>
+
+</ui:composition>

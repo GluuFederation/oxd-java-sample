@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><ui:insert name="title">Title here</ui:insert></title>
+
+    <c:set var="root" value="#{request.contextPath}" />
+    <link rel="stylesheet" href="#{root}/static/bootstrap.min.css" />
+    <style type="text/css">
+        pre{ background-color:#cc5; margin : 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <ui:insert name="header">Header here</ui:insert>
+        </div>
+
+        <ui:fragment  rendered="#{not skip_warning_oxd}">
+            <ui:include src="warning_oxd_setup.xhtml" />
+        </ui:fragment>
+
+        <ui:insert name="content">Content here</ui:insert>
+    </div>
+
+    <script src="#{root}/static/jquery.min.js"></script>
+    <script src="#{root}/static/bootstrap.min.js"></script>
+    <script src="#{root}/static/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

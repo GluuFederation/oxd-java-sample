@@ -1,0 +1,22 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="header">
+        <div class="col-md-11">
+            <h1 align="center">You are done!</h1>
+        </div>
+        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div class="well">
+            <p>
+                You have gone through all steps and have logged off the Authorization Server.
+                To start all over again, please click <a href="index.xhtml">here</a>.
+            </p>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

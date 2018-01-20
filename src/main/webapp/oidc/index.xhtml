@@ -1,0 +1,54 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <ui:define name="title">oxd OpenID Connect APIs</ui:define>
+
+    <ui:define name="header">
+        <div class="col-md-11"><h1 align="center">oxd OpenID Connect APIs</h1></div>
+        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div class="well">
+            <p>
+                <b>Important terminology</b>: <br/>
+                <ul>
+                    <li>
+                        <i>Client or Relying Party</i> (RP): A client application requiring End-User Authentication and Claims from an OpenID Provider. In this case,
+                        this webapp is the <b>client</b>.
+                    </li>
+                    <li>
+                        <i>Authorization Server</i>: The OpenID Provider (OP). For example, the Gluu Server instance you are pointing to by the <b>"OP Host"</b>
+                        field in the <a href="#{root}/settings.xhtml">settings page</a>.
+                    </li>
+                </ul>
+
+            </p>
+        </div>
+
+        <p>
+            Oxd-Java allows developers to implement the
+            <a href="http://openid.net/specs/openid-connect-core-1_0.html#Authentication" target="_blank">OpenID Connect Authorization Code Flow</a>
+            for authentication as well as to obtain basic profile information about the End-User.</p>
+
+        <p>
+            The following is a typical flow:
+            <ol>
+                <li>Client prepares an authentication Request.</li>
+                <li>Client sends the request to the Authorization Server.</li>
+                <li>Authorization Server authenticates the End-User and sends him back to the Client with an Authorization Code.</li>
+                <li>Client sends a request for tokens using the Authorization Code.</li>
+                <li>Client receives a response that contains an ID Token and Access Token.</li>
+                <li>Client sends a request to obtain user claims using the Access Token.</li>
+                <li>Client logs out user from the application and from the Authorization Server.</li>
+            </ol>
+        </p>
+
+        <p>Press the button to trigger the sample flow <small>(link opens a new tab)</small>.</p>
+
+        <div class="col-md-offset-1">
+            <a class="btn btn-primary" href="pre_authz.xhtml" target="_blank" role="button"> Start... </a>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

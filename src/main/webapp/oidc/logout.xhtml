@@ -1,0 +1,52 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="header">
+        <div class="col-md-11">
+            <h1 align="center">
+                <c:choose>
+                    <c:when test="#{sessionUtil.isCurrent('LOGOUT_OP')}">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</c:when>
+                    <c:otherwise>Oops</c:otherwise>
+                </c:choose>
+            </h1>
+        </div>
+        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <c:set var="step" value="#{sessionUtil.stage.step}" />
+
+        <div class="well">
+            <p>
+                You have gone through steps 1 - #{step-1}.
+            </p>
+        </div>
+
+        <p>
+            After End-User has logged out, the Client might request to log him out of the OP too. For this, a logout URL
+            is obtained and the End-User's browser is redirected to such location. Then OP will make the browser return
+            to a predefined <b>"Post Logout Uri"</b> that was supplied (or set) during site registration.
+        </p>
+
+        <p>
+            <br />
+            The following logout URL was obtained:
+        </p>
+
+        <p><code>#{sessionUtil.logoutUrl}</code></p>
+
+        <p>
+            <br />
+            Click the button to end our sample flow.
+        </p>
+
+        <div class="col-md-offset-1">
+            <h:form>
+                <h:commandButton value=" Logout " styleClass="btn btn-primary" action="#{sessionUtil.goLogout()}"/>
+            </h:form>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

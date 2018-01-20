@@ -19,6 +19,7 @@ public class ContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce){ }
 
     public void contextInitialized(ServletContextEvent sce){
+        oxdService.setAppContextUrl(sce.getServletContext().getContextPath());
         oxdService.register();
     }
 
