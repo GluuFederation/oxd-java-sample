@@ -1,4 +1,4 @@
-<p xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<div xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <c:if test="#{sessionUtil.isCurrent('TOKEN_REQUEST')}">
 
@@ -9,7 +9,7 @@
         </p>
 
         <p>
-            In the next step we ask for and <i>Access Token</i> and an <i>ID Token</i> based on the following
+            In this step we'll ask for an <i>Access Token</i> and an <i>ID Token</i> based on the following
             query parameters received in this page URL:
             <ul>
                 <li><b>code:</b> #{requestBean.code}</li>
@@ -18,7 +18,7 @@
         </p>
 
         <p>
-            Press the button below to trigger step #{step +1}.
+            Press the button below to continue.
 
             <div class="col-md-offset-1">
                 <h:form>
@@ -48,7 +48,7 @@
                 </p>
 
                 <p>
-                    The following is the ID Token after decoding:
+                    The following is the ID Token shown above after decoding:
                 </p>
                 <pre>#{sessionUtil.idTokenAsJson}</pre>
 
@@ -69,4 +69,4 @@
 
     </c:if>
 
-</p>
+</div>

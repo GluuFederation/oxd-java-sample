@@ -1,0 +1,33 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="title">OpenID connect Authorization Code Flow</ui:define>
+
+    <ui:define name="header">
+        <c:choose>
+            <c:when test="#{sessionUtil.isCurrent(stage)}">
+                <div class="col-md-11">
+                    <h1 align="center">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</h1>
+                </div>
+                <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
+            </c:when>
+            <c:otherwise><h1 align="center">Oops</h1></c:otherwise>
+        </c:choose>
+    </ui:define>
+
+    <ui:define name="content">
+        <ui:fragment rendered="#{not empty oxdConfig.oxdId}">
+            <c:choose>
+                <c:when test="#{sessionUtil.isCurrent(stage)}">
+                    <ui:insert name="main_content" />
+                </c:when>
+                <c:otherwise>
+                    <p align="center" class="bg-danger">
+                        This page does not match the current stage of the flow. Click <a href="#{sessionUtil.stage.url}">here</a>.
+                    </p>
+                </c:otherwise>
+            </c:choose>
+        </ui:fragment>
+    </ui:define>
+
+</ui:composition>

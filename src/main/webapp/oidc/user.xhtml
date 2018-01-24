@@ -1,52 +1,40 @@
-<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="../template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets" template="template.xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
-    <ui:define name="header">
-        <div class="col-md-11">
-            <h1 align="center">
-                <c:choose>
-                    <c:when test="#{sessionUtil.isCurrent('USER_INFO')}">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</c:when>
-                    <c:otherwise>Oops</c:otherwise>
-                </c:choose>
-            </h1>
+    <ui:param name="stage" value="USER_INFO" />
+
+    <ui:define name="main_content">
+
+        <c:set var="step" value="#{sessionUtil.stage.step}" />
+
+        <div class="well">
+            <p>
+                You have gone through steps 1 - #{step-1}.
+            </p>
         </div>
-        <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
-    </ui:define>
 
-    <ui:define name="content">
-        <ui:fragment rendered="#{not empty oxdConfig.oxdId}">
+        <p>The following claims were obtained after consultation of UserInfo Endpoint:</p>
+        <pre>#{sessionUtil.userInfoReponseAsJson}</pre>
 
-            <c:set var="step" value="#{sessionUtil.stage.step}" />
+        <p>
+            <br />
+            The set of claims in the response depends on the access privileges associated to the Access Token obtained
+            in step 5. This can be configured by specifying additional scopes when the site registration occurs in oxd.
+        </p>
+        <p>
+            The <b>sub</b> claim is an identifier for the End-User which is intended to be consumed by the Client.
+        </p>
 
-            <div class="well">
-                <p>
-                    You have gone through steps 1 - #{step-1}.
-                </p>
+        <p>
+            Press the button below to trigger step #{step +1}.
+
+            <div class="col-md-offset-1">
+                <h:form>
+                    <h:commandButton value="Log out from app" styleClass="btn btn-primary" action="#{sessionUtil.logout('/oidc/logout.xhtml')}"/>
+                </h:form>
             </div>
+        </p>
 
-            <p>The following claims were obtained after consultation of UserInfo Endpoint:</p>
-            <pre>#{sessionUtil.userInfoReponseAsJson}</pre>
-
-            <p>
-                <br />
-                The set of claims in the response depend on the access privileges associated to the Access Token obtained
-                in step 5. This can be configured by specifying additional scopes when the site registration occurs in oxd.
-            </p>
-            <p>
-                The <b>sub</b> claim is an identifier for the End-User which is intended to be consumed by the Client.
-            </p>
-
-            <p>
-                Press the button below to trigger step #{step +1}.
-
-                <div class="col-md-offset-1">
-                    <h:form>
-                        <h:commandButton value="Log out from app" styleClass="btn btn-primary" action="#{sessionUtil.logout('/oidc/logout.xhtml')}"/>
-                    </h:form>
-                </div>
-            </p>
-
-        </ui:fragment>
     </ui:define>
 
 </ui:composition>
