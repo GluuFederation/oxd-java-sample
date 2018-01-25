@@ -4,7 +4,6 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.ServletContext;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
@@ -29,7 +28,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Created by jgomer on 2018-01-15.
+ * A managed bean that performs all the interactions with oxd-server (executes the oxd-java API calls).
+ * @author jgomer
  */
 @Named
 @ApplicationScoped
@@ -38,19 +38,21 @@ public class OxdService {
     @Inject
     private OxdConfig config;
 
+    //Network clients (don't confuse with openID clients)
     private CommandClient commandClient;
     private ResteasyClient rsClient;
-
-    private String appContextUrl;
 
     private Logger logger = LogManager.getLogger(getClass());
     private ObjectMapper mapper = new ObjectMapper();
 
-    public OxdService() {
-    }
-
+    /**
+     * Calls Site Registration (for socket-based) or Setup Client (for https-based oxd connection) operations by supplying
+     * current configuration parameters. Actual calls are issued only if all necessary parameters are present.
+     * @return True if operation was carried out successfully. False otherwise (failed operation or missing parameters)
+     */
     public boolean register() {
 
+        config.resetClient();
         logger.info("Attempting registration with settings: {}", config.toString());
         try {
             boolean nulls = config.getPort()==0 ||
@@ -60,10 +62,6 @@ public class OxdService {
             if (nulls)
                 logger.info("One or more required parameters are missing");
             else {
-                String uri=OxdConfig.getServerRoot() + appContextUrl;
-                config.setRedirectUri(uri + "/oidc/tokens.xhtml");
-                config.setPostLogoutUri(uri + "/oidc/post-logout.xhtml");
-
                 closeClients();
                 if (config.isUseHttpsExtension())
                     doRegistrationHttps();
@@ -74,12 +72,24 @@ public class OxdService {
         catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        logger.warn("Registration was {} successful", config.getOxdId() == null ? "not" : "");
+        if (config.getOxdId() == null){
+            logger.warn("Registration failed");
+            return false;
+        }
+        else{
+            //Make settings persistent
+            config.store();
 
-        return config.getOxdId() != null;
+            logger.warn("Registration successful");
+            return true;
+        }
 
     }
 
+    /**
+     * Calls Site Registration API operation.
+     * @throws Exception When the operation failed to succeed
+     */
     private void doRegistrationSocket() throws Exception {
 
         config.setClientName("sampleapp-client-" + System.currentTimeMillis());
@@ -92,7 +102,7 @@ public class OxdService {
         cmdParams.setAcrValues(getListValues(config.getAcrValues()));
         cmdParams.setClientName(config.getClientName());
 
-        //These scopes should be set to default=true in LDAP (or using oxTrust). Otherwise the following will have no effect
+        //For Gluu Server, these scopes should be set to default=true in LDAP (or using oxTrust).
         cmdParams.setScope(getListValues(config.getScopes()));
 
         cmdParams.setResponseTypes(Collections.singletonList("code"));
@@ -104,6 +114,10 @@ public class OxdService {
 
     }
 
+    /**
+     * Calls Setup Client API operation.
+     * @throws Exception When the operation failed to succeed
+     */
     private void doRegistrationHttps() throws Exception {
 
         config.setClientName("sampleapp-client-extension-" + System.currentTimeMillis());
@@ -128,10 +142,11 @@ public class OxdService {
         config.setClientSecret(setup.getClientSecret());
 
     }
+
     /**
-     * Returns a string with an autorization URL to redirect an application (see OpenId connect "code" flow)
-     * @return String consisting of an authentication request with desired parameters
-     * @throws Exception
+     * Calls the Get Authorization URL API operation.
+     * @return String URL consisting of an authentication request with desired parameters
+     * @throws Exception When the operation failed to succeed
      */
     public String getAuthzUrl() throws Exception{
 
@@ -150,6 +165,13 @@ public class OxdService {
 
     }
 
+    /**
+     * Calls the Get Tokens by Code API operation.
+     * @param code Parameter code
+     * @param state Parameter state
+     * @return A {@link GetTokensByCodeResponse org.xdi.oxd.common.response.GetTokensByCodeResponse} object
+     * @throws Exception When the operation failed to succeed
+     */
     public GetTokensByCodeResponse getTokens(String code, String state) throws Exception {
 
         GetTokensByCodeParams cmdParams = new GetTokensByCodeParams();
@@ -169,6 +191,12 @@ public class OxdService {
 
     }
 
+    /**
+     * Calls the Get User Info API operation.
+     * @param accessToken Parameter access_token
+     * @return A {@link GetUserInfoResponse org.xdi.oxd.common.response.GetUserInfoResponse} object
+     * @throws Exception When the operation failed to succeed
+     */
     public GetUserInfoResponse getUserInfo(String accessToken) throws Exception{
 
         GetUserInfoParams cmdParams = new GetUserInfoParams();
@@ -186,6 +214,12 @@ public class OxdService {
 
     }
 
+    /**
+     * Calls the Get Logout URI API operation.
+     * @param idTokenHint Parameter id_token_hint
+     * @return A String representing the URL to redirect the user to (in order to log out of the OP)
+     * @throws Exception When the operation failed to succeed
+     */
     public String getLogoutUrl(String idTokenHint) throws Exception{
 
         GetLogoutUrlParams cmdParams = new GetLogoutUrlParams();
@@ -218,6 +252,16 @@ public class OxdService {
             rsClient.close();
     }
 
+    /**
+     * Issues REST requests to oxd-https-extension
+     * @param params An object that represents the payload to use
+     * @param path The relative path (with respect to oxd-https-extension root URL) that represents the operation endpoint
+     * @param token An access token to perform the request (normally coming out of a call to Get Client Token operation)
+     * @param responseClass A Class to which the object being return belongs to
+     * @param <T> Type parameter for class
+     * @return The response received after being parsed using type T (null if the HTTP response code received was not 200)
+     * @throws Exception Anomaly when issuing the request or passing the response
+     */
     private <T> T restResponse(IParams params, String path, String token, Class <T> responseClass) throws Exception{
 
         String payload = mapper.writeValueAsString(params);
@@ -237,6 +281,11 @@ public class OxdService {
 
     }
 
+    /**
+     * Calls the Get Client Token operation
+     * @return A String with an access token (usually employed to protect other API calls when using https extension)
+     * @throws Exception When the operation failed to succeed
+     */
     private String getPAT() throws Exception {
 
         GetClientTokenParams cmdParams = new GetClientTokenParams();
@@ -247,14 +296,10 @@ public class OxdService {
 
         GetClientTokenResponse resp = restResponse(cmdParams, "get-client-token", null, GetClientTokenResponse.class);
         String token=resp.getAccessToken();
-        logger.trace("getPAT. token={}", token);
+        logger.trace("getPAT. token: {}", token);
 
         return token;
 
-    }
-
-    public void setAppContextUrl(String appContextUrl) {
-        this.appContextUrl = appContextUrl;
     }
 
     @PreDestroy

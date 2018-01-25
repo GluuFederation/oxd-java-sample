@@ -8,7 +8,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 /**
- * Created by jgomer on 2018-01-15.
+ * A Servlet context listener that contains methods meant to be invoked upong application startup and shutdown.
+ * @author jgomer
  */
 @WebListener
 public class ContextListener implements ServletContextListener {
@@ -19,7 +20,7 @@ public class ContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce){ }
 
     public void contextInitialized(ServletContextEvent sce){
-        oxdService.setAppContextUrl(sce.getServletContext().getContextPath());
+        //Execute a "Site registration" or "Setup client" operation with data available
         oxdService.register();
     }
 

@@ -17,13 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 /**
- * Created by jgomer on 2018-01-16.
+ * A class employed to maintain the state of the sample Authentication workflow showcased by this application. It helps
+ * modeling the steps as well as do page navigation.
+ * @author jgomer
  */
-@Named
+@Named("flow")
 @SessionScoped
-public class SessionUtil implements Serializable {
+public class FlowManager implements Serializable {
 
     @Inject
     private OxdService oxdService;
@@ -31,19 +34,24 @@ public class SessionUtil implements Serializable {
     @Inject
     private HttpServletRequest req;
 
+    /**
+     * An enumeration that represents the possible stages in the sample workflow. See app's page <code>/code_flow.xhtml</code>.
+     */
     public enum Stage{
-        PRE_AUTHZ_URL (1, "Authentication Request preparation"),
-        TOKEN_REQUEST (4, "Token request to Authorization Server"),
-        TOKEN_RESPONSE (5, "ID Token and Access Token received"),
-        USER_INFO (6, "Obtain user claims"),
-        LOGOUT_OP (7, "Logout");
+        PRE_AUTHZ_URL (1, "Authentication Request preparation", "pre_authz.xhtml"),
+        TOKEN_REQUEST (4, "Token request to Authorization Server", "tokens.xhtml"),
+        TOKEN_RESPONSE (5, "ID Token and Access Token received", "tokens.xhtml"),
+        USER_INFO (6, "Obtain user claims", "user.xhtml"),
+        LOGOUT_OP (7, "Logout", "logout.xhtml");
 
         private int step;
         private String summary;
+        private String url;
 
-        Stage(int step, String summary){
+        Stage(int step, String summary, String url){
             this.step=step;
             this.summary=summary;
+            this.url=url;
         }
 
         public int getStep() {
@@ -54,13 +62,17 @@ public class SessionUtil implements Serializable {
             return summary;
         }
 
+        public String getUrl() {
+            return url;
+        }
+
     }
 
     private ObjectMapper mapper;
-    private Stage stage;
-    private boolean loggedIn;
     private Logger logger = LogManager.getLogger(getClass());
+    private Stage stage;
 
+    //These class fields hold data to be displayed in the UI.  Values are grabbed by oxdService being when the workflow is running
     private String authzUrl;
     private String code;
     private String state;
@@ -71,17 +83,30 @@ public class SessionUtil implements Serializable {
     private String userInfoReponseAsJson;
     private String logoutUrl;
 
+    /**
+     * Obtains an authorization URL and updates internal object state
+     * @return The String URL that was retrieved
+     * @throws Exception If an error was presented when retrieving the information from oxd.
+     */
     public String getAuthorizationUrl() throws Exception{
         authzUrl=oxdService.getAuthzUrl();
         return authzUrl;
     }
 
+    /**
+     * Starts the second step of the flow ("Client sends the request to the Authorization Server") by redirecting to the
+     * URL previously retrieved by {@link #getAuthorizationUrl()}
+     * @throws IOException If the redirection could not be carried out
+     */
     public void goAuthenticate() throws IOException {
         redirectExternal(authzUrl);
         stage=Stage.TOKEN_REQUEST;
     }
 
-    public void getTokensResponse() {
+    /**
+     * Updates the values of the fields that will be shown in the page of step "ID Token and Access Token received"
+     */
+    public void retrieveTokens() {
 
         try {
             GetTokensByCodeResponse response = oxdService.getTokens(code, state);
@@ -99,7 +124,11 @@ public class SessionUtil implements Serializable {
 
     }
 
-    public void getUserInfo(String url) throws IOException{
+    /**
+     * Updates the values of the fields that will be shown in the page of step "Obtain user claims" and redirects to such page
+     * @throws IOException If there was an error redirecting
+     */
+    public void retrieveUserInfo() throws IOException{
 
         try {
             GetUserInfoResponse response = oxdService.getUserInfo(accessToken);
@@ -108,12 +137,16 @@ public class SessionUtil implements Serializable {
         catch (Exception e){
             logger.error(e.getMessage(), e);
         }
-        redirect(url);
         stage=Stage.USER_INFO;
+        redirect();
 
     }
 
-    public void logout(String url) throws Exception{
+    /**
+     * Redirects to the page that shows "Logout" info after obtaining a logout url
+     * @throws Exception If there was an error redirecting
+     */
+    public void logout() throws Exception{
 
         try{
             logoutUrl=oxdService.getLogoutUrl(idToken);
@@ -121,14 +154,18 @@ public class SessionUtil implements Serializable {
         catch (Exception e){
             logger.error(e.getMessage(), e);
         }
-        redirect(url);
         stage=Stage.LOGOUT_OP;
+        redirect();
 
     }
 
+    /**
+     * Triggers the actual log out step by redirecting to the logout URL
+     * @throws Exception If there was an error redirecting
+     */
     public void goLogout() throws Exception{
         redirectExternal(logoutUrl);
-        stage=Stage.PRE_AUTHZ_URL;
+        resetFields();
     }
 
     public Stage getStage() {
@@ -167,16 +204,13 @@ public class SessionUtil implements Serializable {
         this.state = state;
     }
 
+    /**
+     * Determines if the current stage of the flow is contained in the list of stages passed as parameter
+     * @param strStage A comma-separated list of stage names
+     * @return True if current stage is part of list. False otherwise
+     */
     public boolean isCurrent(String strStage){
-        return stage.toString().equals(strStage);
-    }
-
-    public boolean isTokenStep(){
-        return stage.equals(Stage.TOKEN_REQUEST) || stage.equals(Stage.TOKEN_RESPONSE);
-    }
-
-    public boolean isLoggedIn() {
-        return loggedIn;
+        return Stream.of(strStage.split(".\\s+")).anyMatch(str -> stage.toString().equals(str));
     }
 
     private void redirectExternal(String url) throws IOException{
@@ -185,22 +219,39 @@ public class SessionUtil implements Serializable {
         externalContext.redirect(url);
     }
 
-    private void redirect(String url) throws IOException{
+    private void redirect() throws IOException{
 
         FacesContext facesContext=FacesContext.getCurrentInstance();
+        String url=OxdConfig.URL_PREFIX + "/" + stage.getUrl();
         url=facesContext.getApplication().getViewHandler().getRedirectURL(facesContext, url, Collections.emptyMap(), false);
         redirectExternal(url);
 
     }
 
     @PostConstruct
-    public void init(){
+    private void init(){
 
         mapper=new ObjectMapper();
         mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
         mapper.disable(SerializationConfig.Feature.WRITE_NULL_PROPERTIES);
 
+        resetFields();
+
+    }
+
+    private void resetFields(){
+
         stage=Stage.PRE_AUTHZ_URL;
+        authzUrl=null;
+        code=null;
+        state=null;
+        tokensReponseAsJson=null;
+        accessToken=null;
+        idToken=null;
+        idTokenAsJson=null;
+        userInfoReponseAsJson=null;
+        logoutUrl=null;
+
     }
 
 }
