@@ -5,7 +5,7 @@
 
     <ui:define name="main_content">
 
-        <c:set var="step" value="#{sessionUtil.stage.step}" />
+        <c:set var="step" value="#{flow.stage.step}" />
 
         <div class="well">
             <p>
@@ -14,7 +14,7 @@
         </div>
 
         <p>The following claims were obtained after consultation of UserInfo Endpoint:</p>
-        <pre>#{sessionUtil.userInfoReponseAsJson}</pre>
+        <pre>#{flow.userInfoReponseAsJson}</pre>
 
         <p>
             <br />
@@ -30,7 +30,7 @@
 
             <div class="col-md-offset-1">
                 <h:form>
-                    <h:commandButton value="Log out from app" styleClass="btn btn-primary" action="#{sessionUtil.logout('/oidc/logout.xhtml')}"/>
+                    <h:commandButton value="Log out from app" styleClass="btn btn-primary" action="#{flow.logout()}"/>
                 </h:form>
             </div>
         </p>

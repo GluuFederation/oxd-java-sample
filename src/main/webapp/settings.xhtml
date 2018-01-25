@@ -5,59 +5,83 @@
 
     <ui:define name="header">
         <ui:param name="skip_warning_oxd" value="true" />
-        <div class="col-md-11"><h1 align="center">oxd server integration</h1></div>
+        <div class="col-md-11"><h1 align="center">Site registration</h1></div>
         <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
     </ui:define>
 
     <ui:define name="content">
 
         <div class="well">
+            <p>Provide parameters needed to integrate this application with an existing oxd server.</p>
             <p>
-                Provide the following required parameters to integrate this application with an existing oxd server. Once
-                you click on <b>Save</b>, an attempt to <a href="https://gluu.org/docs/oxd/api/#register-site" target="_blank">register</a>
-                an OpenID client will be executed and results of the operation will be shown at the bottom of the page.
+                Once you click on <b>Save</b>, the <a href="https://gluu.org/docs/oxd/api/#register-site" target="_blank">Register Site</a>
+                method of the API will be executed. Typically this is a one-time operation and it returns the so-called <b>oxd ID</b>
+                (an identifier for the application, which is passed in subsequent API calls).
             </p>
         </div>
 
         <h:form class="form-horizontal" prependId="false">
             <div class="form-group">
                 <label class="col-md-2 control-label" for="ophost">OP host</label>
-                <div class="col-md-4">
-                    <h:inputText id="ophost" size="40" styleClass="form-control" value="#{oxdConfig.opHost}"
+                <div class="col-md-5">
+                    <h:inputText id="ophost" styleClass="form-control" value="#{oxdConfig.opHost}"
                         a:placeholder="OpenID provider URL, eg. https://my-gluu.host.com"/>
                 </div>
             </div>
             <hr />
             <div class="form-group">
                 <label class="col-md-2 control-label" for="host">oxd server host</label>
-                <div class="col-md-4">
-                    <h:inputText id="host" size="40" styleClass="form-control" value="#{oxdConfig.host}" />
+                <div class="col-md-5">
+                    <h:inputText id="host" styleClass="form-control" value="#{oxdConfig.host}" />
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label" for="port">oxd port</label>
-                <div class="col-md-4">
-                    <h:inputText id="port" size="40" styleClass="form-control" value="#{oxdConfig.port}" />
+                <label class="col-md-2 control-label" for="port">oxd server port</label>
+                <div class="col-md-5">
+                    <h:inputText id="port" styleClass="form-control" value="#{oxdConfig.port}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="https">use https</label>
+                <div class="col-md-5">
+                    <h:selectBooleanCheckbox id="https" value="#{oxdConfig.useHttpsExtension}" />
+                    <span class="small" style="padding-left:6px">check only if host/port provided above correspond to an oxd-https-extension</span>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="acrs">acr values</label>
-                <div class="col-md-4">
-                    <h:inputText id="acrs" size="40" styleClass="form-control" value="#{oxdConfig.acrValues}" a:placeholder="Comma separated list of ACRs" />
+                <div class="col-md-5">
+                    <h:inputText id="acrs" styleClass="form-control" value="#{oxdConfig.acrValues}" a:placeholder="Comma separated list of ACRs" />
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="scopes">OpenID scopes</label>
-                <div class="col-md-4">
-                    <h:inputText id="scopes" size="40" styleClass="form-control" value="#{oxdConfig.scopes}" a:placeholder="Comma separated list of scopes" />
+                <div class="col-md-5">
+                    <h:inputText id="scopes" styleClass="form-control" value="#{oxdConfig.scopes}" a:placeholder="Comma separated list of scopes" />
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-md-offset-2 col-md-4">
+                <label class="col-md-2 control-label" for="redirecturi">Redirect Uri<sup>&#167;</sup></label>
+                <div class="col-md-5">
+                    <h:inputText id="redirecturi" styleClass="form-control" value="#{oxdConfig.redirectUri}" a:readonly="readonly" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="postlogouturi">Post Logout Uri<sup>&#167;</sup></label>
+                <div class="col-md-5">
+                    <h:inputText id="postlogouturi" styleClass="form-control" value="#{oxdConfig.postLogoutUri}" a:readonly="readonly" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2">
                     <h:commandButton value=" Save " styleClass="btn btn-primary" action="#{oxdService.register}"/>
                 </div>
             </div>
         </h:form>
+
+        <p class="small">
+            (&#167;) parameter value fixed for convenience
+        </p>
 
         <h:panelGroup rendered="#{oxdConfig.oxdId eq null and facesContext.postback}">
             <p align="center" class="bg-danger">Registration of client did not succeed... Check your settings or the console output.</p>
@@ -95,18 +119,6 @@
                             <td>#{oxdConfig.clientName}</td>
                         </tr>
 
-                        <tr>
-                            <td><b>Redirect Uri</b></td>
-                            <td>#{oxdConfig.redirectUri}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Post Logout Uri</b></td>
-                            <td>#{oxdConfig.postLogoutUri}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Https extension</b></td>
-                            <td>#{oxdConfig.useHttpsExtension}</td>
-                        </tr>
                         <!--tr>
                             <td>ACR values</td>
                             <td></td>

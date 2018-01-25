@@ -5,7 +5,7 @@
 
     <ui:define name="main_content">
 
-        <c:set var="step" value="#{sessionUtil.stage.step}" />
+        <c:set var="step" value="#{flow.stage.step}" />
 
         <div class="well">
             <p>
@@ -24,16 +24,16 @@
             The following logout URL was obtained:
         </p>
 
-        <p><code>#{sessionUtil.logoutUrl}</code></p>
+        <p><code>#{flow.logoutUrl}</code></p>
 
         <p>
             <br />
-            Click the button to end our sample flow.
+            Click the button to end this sample flow.
         </p>
 
         <div class="col-md-offset-1">
             <h:form>
-                <h:commandButton value=" Logout " styleClass="btn btn-primary" action="#{sessionUtil.goLogout()}"/>
+                <h:commandButton value=" Logout " styleClass="btn btn-primary" action="#{flow.goLogout()}"/>
             </h:form>
         </div>
 

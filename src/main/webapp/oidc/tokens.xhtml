@@ -5,7 +5,7 @@
 
     <ui:define name="main_content">
 
-        <c:set var="step" value="#{sessionUtil.stage.step}" />
+        <c:set var="step" value="#{flow.stage.step}" />
 
         <c:choose>
             <c:when test="#{empty param.error}">

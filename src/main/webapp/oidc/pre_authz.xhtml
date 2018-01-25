@@ -10,7 +10,7 @@
             The following authorization URL was obtained via oxd-java to start the authentication request:
         </p>
 
-        <p><code>#{sessionUtil.authorizationUrl}</code></p>
+        <p><code>#{flow.authorizationUrl}</code></p>
 
         <p>
             <br />
@@ -19,7 +19,7 @@
 
         <div class="col-md-offset-1">
             <h:form>
-                <h:commandButton value=" Go... " styleClass="btn btn-primary" action="#{sessionUtil.goAuthenticate()}"/>
+                <h:commandButton value=" Go... " styleClass="btn btn-primary" action="#{flow.goAuthenticate()}"/>
             </h:form>
         </div>
 

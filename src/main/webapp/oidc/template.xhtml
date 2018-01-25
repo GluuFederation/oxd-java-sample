@@ -5,9 +5,9 @@
 
     <ui:define name="header">
         <c:choose>
-            <c:when test="#{sessionUtil.isCurrent(stage)}">
+            <c:when test="#{flow.isCurrent(stage)}">
                 <div class="col-md-11">
-                    <h1 align="center">Step #{sessionUtil.stage.step}. #{sessionUtil.stage.summary}</h1>
+                    <h1 align="center">Step #{flow.stage.step}. #{flow.stage.summary}</h1>
                 </div>
                 <div class="col-md-1"><br /><a class="btn btn-success" href="#{root}/">Home page</a></div>
             </c:when>
@@ -18,12 +18,12 @@
     <ui:define name="content">
         <ui:fragment rendered="#{not empty oxdConfig.oxdId}">
             <c:choose>
-                <c:when test="#{sessionUtil.isCurrent(stage)}">
+                <c:when test="#{flow.isCurrent(stage)}">
                     <ui:insert name="main_content" />
                 </c:when>
                 <c:otherwise>
                     <p align="center" class="bg-danger">
-                        This page does not match the current stage of the flow. Click <a href="#{sessionUtil.stage.url}">here</a>.
+                        This page does not match the current stage of the flow. Click <a href="#{flow.stage.url}">here</a>.
                     </p>
                 </c:otherwise>
             </c:choose>

@@ -1,6 +1,6 @@
 <div xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
-    <c:if test="#{sessionUtil.isCurrent('TOKEN_REQUEST')}">
+    <c:if test="#{flow.isCurrent('TOKEN_REQUEST')}">
 
         <p>
             You were authenticated at the Authorization Server and have been redirected to this page whose location matches
@@ -22,21 +22,21 @@
 
             <div class="col-md-offset-1">
                 <h:form>
-                    <h:commandButton value=" Get tokens... " styleClass="btn btn-primary" action="#{sessionUtil.getTokensResponse()}"/>
+                    <h:commandButton value=" Get tokens... " styleClass="btn btn-primary" action="#{flow.retrieveTokens()}"/>
                 </h:form>
             </div>
         </p>
 
     </c:if>
-    <c:if test="#{sessionUtil.isCurrent('TOKEN_RESPONSE')}">
+    <c:if test="#{flow.isCurrent('TOKEN_RESPONSE')}">
 
         <c:choose>
-            <c:when test="#{not empty sessionUtil.accessToken}">
+            <c:when test="#{not empty flow.accessToken}">
 
                 <p>
                     Tokens obtained as response of previous step were:
                 </p>
-                <pre>#{sessionUtil.tokensReponseAsJson}</pre>
+                <pre>#{flow.tokensReponseAsJson}</pre>
 
                 <p>You can access these tokens individually in oxd-java. Json representation was used for displaying convenience only.</p>
 
@@ -50,14 +50,14 @@
                 <p>
                     The following is the ID Token shown above after decoding:
                 </p>
-                <pre>#{sessionUtil.idTokenAsJson}</pre>
+                <pre>#{flow.idTokenAsJson}</pre>
 
                 <p>
                     Press the button below to trigger step #{step +1}.
 
                     <div class="col-md-offset-1">
                         <h:form>
-                            <h:commandButton value=" Get user info... " styleClass="btn btn-primary" action="#{sessionUtil.getUserInfo('/oidc/user.xhtml')}"/>
+                            <h:commandButton value=" Get user info... " styleClass="btn btn-primary" action="#{flow.retrieveUserInfo()}"/>
                         </h:form>
                     </div>
                 </p>
