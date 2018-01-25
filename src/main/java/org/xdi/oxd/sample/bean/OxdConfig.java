@@ -1,57 +1,162 @@
 package org.xdi.oxd.sample.bean;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.ServletContext;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
- * Created by jgomer on 2018-01-15.
+ * A bean employed to store configuration parameters related to oxd:
+ * <ul>
+ *     <li>oxd-server (or oxd-https-extension) location</li>
+ *     <li>Settings required to execute oxd-java API operations</li>
+ *     <li>Output of the latest Site Registration attempt</li>
+ * </ul>
+ * @author jgomer
  */
 @Named
 @ApplicationScoped
 public class OxdConfig {
 
-    private String opHost;
+    static final String URL_PREFIX="/oidc";
+
+    private static final String TMP_DIR=System.getProperty("java.io.tmpdir");
+    private static final String TMP_FILE_NAME ="oxd-java-sample.conf";
+
+    private ObjectMapper mapper;
+    private Logger logger = LogManager.getLogger(getClass());
+
+    @Inject
+    private ServletContext context;
+
+    //Class fields used to "point" to oxd-server
     private String host;
     private int port;
     private boolean useHttpsExtension;
 
-    private String oxdId;
-    private String clientId;
-    private String clientSecret;
-    private String clientName;
-
+    //Fields passed to execute API operation
+    private String opHost;
     private String redirectUri;
     private String postLogoutUri;
     private String acrValues;
     private String scopes;
 
-    private Logger logger = LogManager.getLogger(getClass());
+    //Field utilized to store the result of site registration or setup client step
+    private String oxdId;
+    private String clientId;
+    private String clientSecret;
+    private String clientName;
 
-    public OxdConfig(){
+    @Override
+    public String toString(){
+        StringBuilder sb=new StringBuilder();
+        sb.append("opHost=").append(opHost).append(", ")
+                .append("host=").append(host).append(", ")
+                .append("port=").append(port).append(", ")
+                .append("https-extension=").append(useHttpsExtension);
+        return sb.insert(0, "[").append("]").toString();
+    }
 
-        opHost=System.getProperty("oxd.server.op-host", null);
-        host=System.getProperty("oxd.server.host", "localhost");
+    /**
+     * Nullifies fields related to the openID client created when executing the Site Registration/Setup Client operation
+     */
+    void resetClient(){
+        oxdId=null;
+        clientId=null;
+        clientSecret=null;
+        clientName=null;
+    }
 
-        String _port=System.getProperty("oxd.server.port");
-        try{
-            port=Integer.parseInt(_port);
+    /**
+     * Stores key parameters to disk. This allows the app to successfully interact with oxd server avoiding the user to
+     * enter the configs manually upon every restart.
+     * Files is saved to operating system temporary directory.
+     */
+    void store(){
+
+        try {
+            Map<String, Object> map=mapper.convertValue(this, new TypeReference<Map<String, Object>>(){});
+            Collection<String> params=Arrays.asList("opHost", "host", "port", "useHttpsExtension", "acrValues", "scopes");
+            map.keySet().retainAll(params);
+
+            Properties props=new Properties();
+            params.forEach(prop -> {
+                if (map.get(prop)!=null)
+                    props.setProperty(prop, map.get(prop).toString());
+            });
+
+            Path path=Paths.get(TMP_DIR, TMP_FILE_NAME);
+            logger.info("Saving oxd settings to {}", path.toString());
+            props.store(Files.newOutputStream(path), "oxd-sample-java");
         }
-        catch (Exception e){
-            port=8098;
+        catch (IOException e){
             logger.error(e.getMessage(), e);
-            logger.warn("Defaulting oxd port to {}", port);
         }
-
-        useHttpsExtension=System.getProperty("oxd.server.isExtension")!=null;
-        acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
-        scopes=System.getProperty("oxd.server.scopes", "openid, uma_protection");
 
     }
 
-    static String getServerRoot(){
+    /**
+     * A method called once upon application start. It tries to read  parameters from disk or from Java system properties.
+     * <p>If not found, the default values of a typical oxd installation are assumed.</p>
+     * <p>See the accompanying README file for more info about system properties and default values</p>
+     */
+    @PostConstruct
+    private void init() {
+
+        mapper=new ObjectMapper();
+        boolean fileParsed=false;
+        Path path=Paths.get(TMP_DIR, TMP_FILE_NAME);
+
+        if (Files.exists(path)){
+            Properties props=new Properties();
+            try {
+                props.load(Files.newInputStream(path));
+                BeanUtils.populate(this, props);
+                fileParsed=true;
+            }
+            catch (Exception e){
+                logger.error(e.getMessage(), e);
+            }
+        }
+
+        if (!fileParsed){
+            opHost=System.getProperty("oxd.server.op-host", null);
+            host=System.getProperty("oxd.server.host", "localhost");
+
+            String _port=System.getProperty("oxd.server.port");
+            try{
+                port=Integer.parseInt(_port);
+            }
+            catch (Exception e){
+                port=8099;
+                logger.warn("Defaulting oxd port to {}", port);
+            }
+
+            useHttpsExtension=System.getProperty("oxd.server.isExtension")!=null;
+            acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
+            scopes=System.getProperty("oxd.server.scopes", "openid, uma_protection");
+        }
+
+        String uri=getServerRoot() + context.getContextPath();
+        setRedirectUri(uri + URL_PREFIX + "/tokens.xhtml");
+        setPostLogoutUri(uri + URL_PREFIX + "/post-logout.xhtml");
+
+    }
+
+    private static String getServerRoot(){
 
         StringBuilder uri=new StringBuilder();
         uri.append("https://").append(System.getProperty("oxd.sample.host","localhost"));
@@ -159,16 +264,6 @@ public class OxdConfig {
 
     public void setScopes(String scopes) {
         this.scopes = scopes;
-    }
-
-    @Override
-    public String toString(){
-        StringBuilder sb=new StringBuilder();
-        sb.append("opHost=").append(opHost).append(", ")
-                .append("host=").append(host).append(", ")
-                .append("port=").append(port).append(", ")
-                .append("https-extension=").append(useHttpsExtension);
-        return sb.insert(0, "[").append("]").toString();
     }
 
 }
