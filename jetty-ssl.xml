@@ -7,7 +7,7 @@
             <New id="sslConnector" class="org.eclipse.jetty.server.ServerConnector">
                 <Arg name="server"><Ref refid="Server" /></Arg>
                 <Arg name="factories"><Array type="org.eclipse.jetty.server.ConnectionFactory"></Array></Arg>
-                <Set name="port">8463</Set>
+                <Set name="port"><SystemProperty name="oxd.sample.port" default="8463"/></Set>
             </New>
         </Arg>
     </Call>
@@ -16,7 +16,7 @@
         <Arg>
             <New class="org.eclipse.jetty.server.HttpConfiguration">
                 <Set name="secureScheme">https</Set>
-                <Set name="securePort">8463</Set>
+                <Set name="securePort"><SystemProperty name="oxd.sample.port" default="8463"/></Set>
                 <!--Set name="outputBufferSize">32768</Set>
                 <Set name="requestHeaderSize">8192</Set>
                 <Set name="responseHeaderSize">8192</Set>
