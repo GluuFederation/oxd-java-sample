@@ -120,7 +120,7 @@ public class OxdConfig {
         boolean fileParsed=false;
         Path path=Paths.get(TMP_DIR, TMP_FILE_NAME);
 
-        if (Files.exists(path)){
+        if (Files.exists(path) && System.getProperty("oxd.sample.skip-conf-file")==null){
             Properties props=new Properties();
             try {
                 props.load(Files.newInputStream(path));
@@ -145,7 +145,7 @@ public class OxdConfig {
                 logger.warn("Defaulting oxd port to {}", port);
             }
 
-            useHttpsExtension=System.getProperty("oxd.server.isExtension")!=null;
+            useHttpsExtension=System.getProperty("oxd.server.is-https")!=null;
             acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
             scopes=System.getProperty("oxd.server.scopes", "openid, uma_protection");
         }
