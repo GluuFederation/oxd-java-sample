@@ -1,3 +1,8 @@
+/*
+ * oxd-java-sample is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+ *
+ * Copyright (c) 2018, Gluu
+ */
 package org.xdi.oxd.sample.bean;
 
 import javax.annotation.PreDestroy;
@@ -148,7 +153,7 @@ public class OxdService {
      * @return String URL consisting of an authentication request with desired parameters
      * @throws Exception When the operation failed to succeed
      */
-    public String getAuthzUrl() throws Exception{
+    public String getAuthzUrl() throws Exception {
 
         GetAuthorizationUrlParams cmdParams = new GetAuthorizationUrlParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -197,7 +202,7 @@ public class OxdService {
      * @return A {@link GetUserInfoResponse org.xdi.oxd.common.response.GetUserInfoResponse} object
      * @throws Exception When the operation failed to succeed
      */
-    public GetUserInfoResponse getUserInfo(String accessToken) throws Exception{
+    public GetUserInfoResponse getUserInfo(String accessToken) throws Exception {
 
         GetUserInfoParams cmdParams = new GetUserInfoParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -220,7 +225,7 @@ public class OxdService {
      * @return A String representing the URL to redirect the user to (in order to log out of the OP)
      * @throws Exception When the operation failed to succeed
      */
-    public String getLogoutUrl(String idTokenHint) throws Exception{
+    public String getLogoutUrl(String idTokenHint) throws Exception {
 
         GetLogoutUrlParams cmdParams = new GetLogoutUrlParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -262,7 +267,7 @@ public class OxdService {
      * @return The response received after being parsed using type T (null if the HTTP response code received was not 200)
      * @throws Exception Anomaly when issuing the request or passing the response
      */
-    private <T> T restResponse(IParams params, String path, String token, Class <T> responseClass) throws Exception{
+    private <T> T restResponse(IParams params, String path, String token, Class <T> responseClass) throws Exception {
 
         String payload = mapper.writeValueAsString(params);
         logger.trace("Sending /{} request to oxd-https-extension with payload \n{}", path, payload);
