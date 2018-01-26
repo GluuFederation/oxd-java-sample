@@ -136,14 +136,15 @@
                     <version>${jetty.version}</version>
                     <configuration>
                         <scanIntervalSeconds>0</scanIntervalSeconds>
-                        <!--webApp>
-                            <contextPath>/oxd-java-sample</contextPath>
-                        </webApp-->
+                        <webApp>
+                            <webInfIncludeJarPattern>^$</webInfIncludeJarPattern>
+                            <!--contextPath>/oxd-java-sample</contextPath-->
+                        </webApp>
                         <systemProperties>
-                            <systemProperty>
+                            <!--systemProperty>
                                 <name>org.eclipse.jetty.annotations.maxWait</name>
                                 <value>300</value>
-                            </systemProperty>
+                            </systemProperty-->
                         </systemProperties>
                         <jettyXml>jetty-ssl.xml,jetty-https.xml</jettyXml>
                     </configuration>
