@@ -41,10 +41,10 @@ Double check you have your Gluu Server and oxd-server accessible.
 If you have `git` installed, just open a console and run:
 
 ```
-git clone ???
+git clone https://github.com/GluuFederation/oxd-java-sample.git
 ```
 
-if not, just visit this page??? and click the button labeled "clone or download" to download the project as a zip. Decompress the file to a destination of your choosing, then open a console and `cd` to the project's directory.
+if not, just visit [this page](https://github.com/GluuFederation/oxd-java-sample) and click the button labeled "clone or download" to download the project as a zip. Decompress the file to a destination of your choosing, then open a console and `cd` to the project's directory.
 
 3. Start the app
 
