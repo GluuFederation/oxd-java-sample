@@ -244,7 +244,7 @@ public class OxdService {
     }
 
     private List<String> getListValues(String commaSeparatedStr) {
-        return Arrays.asList(commaSeparatedStr.split(",\\s+"));
+        return Arrays.asList(commaSeparatedStr.split(",\\s*"));
     }
 
     private void closeCommandClient(){
