@@ -58,7 +58,7 @@ public class OxdService {
             if (nulls)
                 logger.info("One or more required parameters are missing");
             else {
-                ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+                ClientInterface clientInterface = OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
                 doRegistration(clientInterface);
             }
         }
@@ -94,6 +94,7 @@ public class OxdService {
         params.setScope(Lists.newArrayList(config.getScopes().split(" ")));
         params.setTrustedClient(true);
         params.setGrantTypes(Lists.newArrayList(config.getGrantTypes().split(" ")));
+        params.setClientName(config.getClientName());
         //params.setResponseTypes(Lists.newArrayList("code"));
         params.setAcrValues(Lists.newArrayList(config.getAcrValues().split(" ")));
 
@@ -111,7 +112,7 @@ public class OxdService {
      */
     public String getAuthzUrl() throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
 
         GetAuthorizationUrlParams cmdParams = new GetAuthorizationUrlParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -133,7 +134,7 @@ public class OxdService {
      */
     public GetTokensByCodeResponse2 getTokens(String code, String state) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
 
         GetTokensByCodeParams cmdParams = new GetTokensByCodeParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -152,7 +153,7 @@ public class OxdService {
      */
     public JsonNode getUserInfo(String accessToken) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
 
         GetUserInfoParams cmdParams = new GetUserInfoParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -170,7 +171,7 @@ public class OxdService {
      */
     public String getLogoutUrl(String idTokenHint) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
 
         final GetLogoutUrlParams params = new GetLogoutUrlParams();
         params.setOxdId(config.getOxdId());
