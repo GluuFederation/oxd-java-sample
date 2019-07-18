@@ -3,14 +3,14 @@
  *
  * Copyright (c) 2018, Gluu
  */
-package org.xdi.oxd.sample.bean;
+package org.gluu.oxd.sample.bean;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.xdi.oxd.common.response.GetTokensByCodeResponse;
-import org.xdi.oxd.common.response.GetUserInfoResponse;
+import org.gluu.oxd.client.GetTokensByCodeResponse2;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
@@ -105,7 +105,7 @@ public class FlowManager implements Serializable {
      */
     public void goAuthenticate() throws IOException {
         redirectExternal(authzUrl);
-        stage=Stage.TOKEN_REQUEST;
+        stage= Stage.TOKEN_REQUEST;
     }
 
     /**
@@ -114,7 +114,7 @@ public class FlowManager implements Serializable {
     public void retrieveTokens() {
 
         try {
-            GetTokensByCodeResponse response = oxdService.getTokens(code, state);
+            GetTokensByCodeResponse2 response = oxdService.getTokens(code, state);
             idTokenAsJson = mapper.writeValueAsString(response.getIdTokenClaims());
             response.setIdTokenClaims(null);
             tokensReponseAsJson=mapper.writeValueAsString(response);
@@ -125,7 +125,7 @@ public class FlowManager implements Serializable {
         catch (Exception e){
             logger.error(e.getMessage(), e);
         }
-        stage=Stage.TOKEN_RESPONSE;
+        stage= Stage.TOKEN_RESPONSE;
 
     }
 
@@ -136,13 +136,13 @@ public class FlowManager implements Serializable {
     public void retrieveUserInfo() throws IOException{
 
         try {
-            GetUserInfoResponse response = oxdService.getUserInfo(accessToken);
-            userInfoReponseAsJson=mapper.writeValueAsString(response.getClaims());
+            JsonNode response = oxdService.getUserInfo(accessToken);
+            userInfoReponseAsJson=mapper.writeValueAsString(response);
         }
         catch (Exception e){
             logger.error(e.getMessage(), e);
         }
-        stage=Stage.USER_INFO;
+        stage= Stage.USER_INFO;
         redirect();
 
     }
@@ -159,7 +159,7 @@ public class FlowManager implements Serializable {
         catch (Exception e){
             logger.error(e.getMessage(), e);
         }
-        stage=Stage.LOGOUT_OP;
+        stage= Stage.LOGOUT_OP;
         redirect();
 
     }
@@ -227,7 +227,7 @@ public class FlowManager implements Serializable {
     private void redirect() throws IOException{
 
         FacesContext facesContext=FacesContext.getCurrentInstance();
-        String url=OxdConfig.URL_PREFIX + "/" + stage.getUrl();
+        String url= OxdConfig.URL_PREFIX + "/" + stage.getUrl();
         url=facesContext.getApplication().getViewHandler().getRedirectURL(facesContext, url, Collections.emptyMap(), false);
         redirectExternal(url);
 
@@ -237,8 +237,8 @@ public class FlowManager implements Serializable {
     private void init(){
 
         mapper=new ObjectMapper();
-        mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
-        mapper.disable(SerializationConfig.Feature.WRITE_NULL_PROPERTIES);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        mapper.disable(SerializationFeature.WRITE_NULL_MAP_VALUES);
 
         resetFields();
 
@@ -246,7 +246,7 @@ public class FlowManager implements Serializable {
 
     private void resetFields(){
 
-        stage=Stage.PRE_AUTHZ_URL;
+        stage= Stage.PRE_AUTHZ_URL;
         authzUrl=null;
         code=null;
         state=null;
@@ -256,7 +256,6 @@ public class FlowManager implements Serializable {
         idTokenAsJson=null;
         userInfoReponseAsJson=null;
         logoutUrl=null;
-
     }
 
 }

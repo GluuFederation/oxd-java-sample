@@ -3,9 +3,9 @@
  *
  * Copyright (c) 2018, Gluu
  */
-package org.xdi.oxd.sample.listener;
+package org.gluu.oxd.sample.listener;
 
-import org.xdi.oxd.sample.bean.OxdService;
+import org.gluu.oxd.sample.bean.OxdService;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
