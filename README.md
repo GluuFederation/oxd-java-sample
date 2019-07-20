@@ -22,9 +22,9 @@ Download [maven](https://maven.apache.org/download.cgi) and follow the simple in
 
 Learn how to download and install Gluu server by visiting this [page](https://gluu.org/docs/ce/installation-guide/).
 
-4. oxd-server
+4. oxd-server - 4.0
 
-Download and install [oxd-server](https://gluu.org/docs/oxd/4.0/). For the purposes of this demo app, built-in default configuration files will work.
+Download and install [oxd-server 4.0](https://gluu.org/docs/oxd/4.0/). For the purposes of this demo app, built-in default configuration files will work.
 
 ## Run
 
