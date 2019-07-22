@@ -12,7 +12,7 @@
     <ui:define name="content">
 
         <div class="well">
-            <p>Provide parameters needed to integrate this application with an existing oxd server.</p>
+            <p>Provide parameters needed to integrate this application with an existing oxd server (version: 4.0).</p>
             <p>
                 Once you click on <b>Save</b>, the <a href="https://gluu.org/docs/oxd/api/#register-site" target="_blank">Register Site</a>
                 method of the API will be executed. Typically this is a one-time operation and it returns the so-called <b>oxd ID</b>
@@ -41,13 +41,7 @@
                     <h:inputText id="port" styleClass="form-control" value="#{oxdConfig.port}" />
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="https">use https</label>
-                <div class="col-md-5">
-                    <h:selectBooleanCheckbox id="https" value="#{oxdConfig.useHttpsExtension}" />
-                    <span class="small" style="padding-left:6px">check only if host/port provided above correspond to an oxd-https-extension</span>
-                </div>
-            </div>
+
             <div class="form-group">
                 <label class="col-md-2 control-label" for="acrs">acr values</label>
                 <div class="col-md-5">

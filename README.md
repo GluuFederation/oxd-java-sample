@@ -22,17 +22,15 @@ Download [maven](https://maven.apache.org/download.cgi) and follow the simple in
 
 Learn how to download and install Gluu server by visiting this [page](https://gluu.org/docs/ce/installation-guide/).
 
-4. oxd-server
+4. oxd-server - 4.0
 
-Download and install [oxd-server](https://gluu.org/docs/oxd/). For the purposes of this demo app, built-in default configuration files will work. Just ensure to fill the property **server_name** in `oxd-conf.json` as well as the license info. You can obtain a license for free at [oxd website](https://oxd.gluu.org). There is no need to "point" to the OP from your oxd config files.
+Download and install [oxd-server 4.0](https://gluu.org/docs/oxd/4.0/). For the purposes of this demo app, built-in default configuration files will work.
 
-If the machine where you'll execute the app is other than the one you used for installing oxd, you may have to run the [oxd https extension](https://gluu.org/docs/oxd/oxd-https/start/) as well. The extension is already bundled with oxd if you chose installing it via binary packages.
-
-## Run 
+## Run
 
 You can run the app without assembling a war file or installing a servlet container. This is achieved by using the Jetty Maven Plugin, which allows users to easily run web applications.
 
-1. Ensure all required components are up and running 
+1. Ensure all required components are up and running
 
 Double check you have your Gluu Server and oxd-server accessible.
 
@@ -89,7 +87,6 @@ The table below lists the set of properties you can provide:
 |**oxd.server.op-host**|The location of the OpenID Provider|https://my.gluu-server.com|
 |**oxd.server.host**|The name of host where oxd-server is located|localhost|
 |**oxd.server.port**|The port of oxd-server|8080|
-|**oxd.server.is-https**|If present, the app will assume that server and port provided (or defaulted) are that of the https extension|Any value (even empty) will work|
 |**oxd.server.acr-values**|A comma-separated list of acrs that will be used in Site Registration and Get Authorization URL operations of the API|`auth_ldap_server`|
 |**oxd.server.scopes**|A comma-separated list of scopes supported by the OP that will be used in Site Registration operation|openid, profile|
 |**oxd.sample.host**|By default this app is accessible at https://localhost:8463/. With this property you can provide a different host name|my.own.box|
@@ -99,12 +96,12 @@ The table below lists the set of properties you can provide:
 The example above shows how to start the app bound to port 1234, using an oxd-https-extension located at `https://my.oxd-ext.org` and an OP located at `https://my.op-provider.com`.
 
 ```
-mvn 	-Doxd.sample.skip-conf-file -Doxd.sample.port=1234 
-	-Doxd.server.is-https -Doxd.server.host=my.oxd-ext.org -Doxd.server.port=443 -Doxd.server.op-host=https://my.op-provider.com 
+mvn 	-Doxd.sample.skip-conf-file -Doxd.sample.port=1234
+	-Doxd.server.is-https -Doxd.server.host=my.oxd-ext.org -Doxd.server.port=443 -Doxd.server.op-host=https://my.op-provider.com
 	jetty:run
 ```
 
-This way your application will be accessible at https://localhost:1234/. 
+This way your application will be accessible at https://localhost:1234/.
 
 Note that **https** MUST always be used. The project files `jetty-ssl.xml`, `jetty-https.xml` and `keystore` already automate the setup in order to support SSL.
 
@@ -121,21 +118,16 @@ The following table depicts the overall anatomy of the application:
 |`webapp` folder|basic UI pages (facelets) and templates|
 |`webapp/static`|CSSs and javascript assets|
 |`webapp/oidc`|UI pages implementing a sample authentication workflow|
-|package `org.xdi.oxd.sample.listener`|Triggers execution of startup logic|
-|package `org.xdi.oxd.sample.bean`|Beans that back UI pages, hold configurations, and interact with oxd-server|
+|package `org.gluu.oxd.sample.listener`|Triggers execution of startup logic|
+|package `org.gluu.oxd.sample.bean`|Beans that back UI pages, hold configurations, and interact with oxd-server|
 
 The last row (`org.xdi.oxd.sample.bean`) deserves a deeper look. Particularly the class `OxdService` that represents an application-scoped bean employed to issue the API calls to oxd via oxd-java library. See how maven's `pom.xml` file lists `oxd-common` and `oxd-client` as one of the first required dependencies for the project.
 
-The public methods in `OxdService` map directly to OpenID Authorization Code flow steps. Note how every method accounts for two paths: one for standard oxd-server communication and other for oxd-https-extension.
+The public methods in `OxdService` map directly to OpenID Authorization Code flow steps.
 
-For standard (socket-based) oxd-server communication, an instance of 
-[CommandClient](https://github.com/GluuFederation/oxd/blob/version_3.1.2/oxd-client/src/main/java/org/xdi/oxd/client/CommandClient.java) is utilized. This instance is reused throughout all API calls. 
+All API calls resemble the way it's already depicted in the oxd-java [doc page]https://gluu.org/docs/oxd/4.0/api/) so we are not getting into those details here. Just note that in this project most of parameters passed are obtained directly from an instance of `OxdConfig` class, which is an application-scoped bean that holds configuration data. These values are set early during [application start](#what-happens-upon-start) or updated when you use the "settings" page of the application.
 
-When it comes to https, all requests are sent using a [RestEasy](http://resteasy.jboss.org/docs.html) Client via HTTP POST. Note how requests are sent accompanied by an authorization header whose value is that of an access token previously obtained by calling the Get Client Token API operation.
-
-All API calls resemble the way it's already depicted in the oxd-java [doc page](https://gluu.org/docs/oxd/libraries/languages/java/) so we are not getting into those details here. Just note that in this project most of parameters passed are obtained directly from an instance of `OxdConfig` class, which is an application-scoped bean that holds configuration data. These values are set early during [application start](#what-happens-upon-start) or updated when you use the "settings" page of the application.
-
-Also worth noting is that parameters sent are always wrapped in instances of classes belong to package [`org.xdi.oxd.common.params`](https://github.com/GluuFederation/oxd/tree/version_3.1.2/oxd-common/src/main/java/org/xdi/oxd/common/params).
+Also worth noting is that parameters sent are always wrapped in instances of classes belong to package [`org.gluu.oxd.common.params`](https://github.com/GluuFederation/oxd/tree/version_4.0/oxd-common/src/main/java/org/gluu/oxd/common/params).
 
 ## Java docs
 

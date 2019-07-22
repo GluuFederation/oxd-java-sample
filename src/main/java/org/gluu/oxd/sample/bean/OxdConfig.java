@@ -3,25 +3,27 @@
  *
  * Copyright (c) 2018, Gluu
  */
-package org.xdi.oxd.sample.bean;
+package org.gluu.oxd.sample.bean;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletContext;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * A bean employed to store configuration parameters related to oxd:
@@ -50,12 +52,12 @@ public class OxdConfig {
     //Class fields used to "point" to oxd-server
     private String host;
     private int port;
-    private boolean useHttpsExtension;
 
     //Fields passed to execute API operation
     private String opHost;
     private String redirectUri;
     private String postLogoutUri;
+    private String grantTypes;
     private String acrValues;
     private String scopes;
 
@@ -65,13 +67,13 @@ public class OxdConfig {
     private String clientSecret;
     private String clientName;
 
+
     @Override
     public String toString(){
         StringBuilder sb=new StringBuilder();
         sb.append("opHost=").append(opHost).append(", ")
                 .append("host=").append(host).append(", ")
-                .append("port=").append(port).append(", ")
-                .append("https-extension=").append(useHttpsExtension);
+                .append("port=").append(port).append(", ");
         return sb.insert(0, "[").append("]").toString();
     }
 
@@ -93,8 +95,8 @@ public class OxdConfig {
     void store(){
 
         try {
-            Map<String, Object> map=mapper.convertValue(this, new TypeReference<Map<String, Object>>(){});
-            Collection<String> params=Arrays.asList("opHost", "host", "port", "useHttpsExtension", "acrValues", "scopes");
+            Map<String, Object> map=mapper.convertValue(this, new TypeReference<Object>(){});
+            Collection<String> params=Arrays.asList("opHost", "host", "port", "acrValues", "grantTypes", "scopes");
             map.keySet().retainAll(params);
 
             Properties props=new Properties();
@@ -146,13 +148,14 @@ public class OxdConfig {
                 port=Integer.parseInt(_port);
             }
             catch (Exception e){
-                port=8099;
+                port=8443;
                 logger.warn("Defaulting oxd port to {}", port);
             }
 
-            useHttpsExtension=System.getProperty("oxd.server.is-https")!=null;
+            //useHttpsExtension=System.getProperty("oxd.server.is-https")!=null;
             acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
-            scopes=System.getProperty("oxd.server.scopes", "openid, uma_protection");
+            scopes=System.getProperty("oxd.server.scopes", "openid uma_protection");
+            grantTypes=System.getProperty("oxd.server.grant-types", "authorization_code client_credentials");
         }
 
         String uri=getServerRoot() + context.getContextPath();
@@ -161,7 +164,7 @@ public class OxdConfig {
 
     }
 
-    private static String getServerRoot(){
+    public static String getServerRoot(){
 
         StringBuilder uri=new StringBuilder();
         uri.append("https://").append(System.getProperty("oxd.sample.host","localhost"));
@@ -185,10 +188,6 @@ public class OxdConfig {
 
     public int getPort() {
         return port;
-    }
-
-    public boolean isUseHttpsExtension() {
-        return useHttpsExtension;
     }
 
     public String getOxdId() {
@@ -219,6 +218,10 @@ public class OxdConfig {
         return redirectUri;
     }
 
+    public String getGrantTypes() {
+        return grantTypes;
+    }
+
     public String getScopes() {
         return scopes;
     }
@@ -233,10 +236,6 @@ public class OxdConfig {
 
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public void setUseHttpsExtension(boolean useHttpsExtension) {
-        this.useHttpsExtension = useHttpsExtension;
     }
 
     public void setOxdId(String oxdId) {
@@ -261,6 +260,10 @@ public class OxdConfig {
 
     public void setPostLogoutUri(String postLogoutUri) {
         this.postLogoutUri = postLogoutUri;
+    }
+
+    public void setGrantTypes(String grantTypes) {
+        this.grantTypes = grantTypes;
     }
 
     public void setAcrValues(String acrValues) {

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2018, Gluu
  */
-package org.xdi.oxd.sample.bean;
+package org.gluu.oxd.sample.bean;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
