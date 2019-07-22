@@ -6,7 +6,7 @@
     <groupId>org.gluu</groupId>
     <artifactId>oxd-java-sample</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
 
     <name>oxd-java-sample webapp</name>
     <url>http://www.gluu.org</url>
