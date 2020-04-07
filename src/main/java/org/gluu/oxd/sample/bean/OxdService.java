@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 /**
  * A managed bean that performs all the interactions with oxd-server (executes the oxd-java API calls).
+ *
  * @author jgomer
  */
 @Named
@@ -43,33 +44,39 @@ public class OxdService {
     /**
      * Calls Site Registration operations by supplying
      * current configuration parameters. Actual calls are issued only if all necessary parameters are present.
+     *
      * @return True if operation was carried out successfully. False otherwise (failed operation or missing parameters)
      */
+    public ClientInterface getClient() throws Exception {
+        if (config.isTrustAllClient()) {
+            return OxdClient.newTrustAllClient(getTargetHost(config.getHost(), config.getPort()));
+        }
+        return OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+    }
+
     public boolean register() {
 
         config.resetClient();
         logger.info("Attempting registration with settings: {}", config.toString());
 
         try {
-            boolean nulls = config.getPort()==0 ||
+            boolean nulls = config.getPort() == 0 ||
                     Stream.of(config.getOpHost(), config.getHost(), config.getAcrValues(), config.getScopes(), config.getGrantTypes(), config.getRedirectUri(), config.getPostLogoutUri())
-                    .anyMatch(obj -> obj==null || obj.length() == 0);
+                            .anyMatch(obj -> obj == null || obj.length() == 0);
 
             if (nulls)
                 logger.info("One or more required parameters are missing");
             else {
-                ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+                ClientInterface clientInterface = getClient();
                 doRegistration(clientInterface);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        if (config.getOxdId() == null){
+        if (config.getOxdId() == null) {
             logger.warn("Registration failed");
             return false;
-        }
-        else{
+        } else {
             //Make settings persistent
             config.store();
 
@@ -81,6 +88,7 @@ public class OxdService {
 
     /**
      * Calls Setup Client API operation.
+     *
      * @throws Exception When the operation failed to succeed
      */
     private void doRegistration(ClientInterface clientInterface) throws Exception {
@@ -107,12 +115,13 @@ public class OxdService {
 
     /**
      * Calls the Get Authorization URL API operation.
+     *
      * @return String URL consisting of an authentication request with desired parameters
      * @throws Exception When the operation failed to succeed
      */
     public String getAuthzUrl() throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = getClient();
 
         GetAuthorizationUrlParams cmdParams = new GetAuthorizationUrlParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -127,14 +136,15 @@ public class OxdService {
 
     /**
      * Calls the Get Tokens by Code API operation.
-     * @param code Parameter code
+     *
+     * @param code  Parameter code
      * @param state Parameter state
      * @return A {@link GetTokensByCodeResponse org.gluu.oxd.common.response.GetTokensByCodeResponse2} object
      * @throws Exception When the operation failed to succeed
      */
     public GetTokensByCodeResponse2 getTokens(String code, String state) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = getClient();
 
         GetTokensByCodeParams cmdParams = new GetTokensByCodeParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -147,13 +157,14 @@ public class OxdService {
 
     /**
      * Calls the Get User Info API operation.
+     *
      * @param accessToken Parameter access_token
      * @return A {@link JsonNode com.fasterxml.jackson.databind.JsonNode} object
      * @throws Exception When the operation failed to succeed
      */
     public JsonNode getUserInfo(String accessToken) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = getClient();
 
         GetUserInfoParams cmdParams = new GetUserInfoParams();
         cmdParams.setOxdId(config.getOxdId());
@@ -166,12 +177,13 @@ public class OxdService {
 
     /**
      * Calls the Get Logout URI API operation.
+     *
      * @return A String representing the URL to redirect the user to (in order to log out of the OP)
      * @throws Exception When the operation failed to succeed
      */
     public String getLogoutUrl(String idTokenHint) throws Exception {
 
-        ClientInterface clientInterface = OxdClient.newClient(getTargetHost(config.getHost(), config.getPort()));
+        ClientInterface clientInterface = getClient();
 
         final GetLogoutUrlParams params = new GetLogoutUrlParams();
         params.setOxdId(config.getOxdId());
