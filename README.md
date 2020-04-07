@@ -92,6 +92,7 @@ The table below lists the set of properties you can provide:
 |**oxd.sample.host**|By default this app is accessible at https://localhost:8463/. With this property you can provide a different host name|my.own.box|
 |**oxd.sample.port**|By default this app runs on port 8463. With this property you can provide a different port|8081|
 |**oxd.sample.skip-conf-file**|If this property is present, the app will ignore the settings file if any|Any value (even empty) will work|
+|**trust.all.client**|If this property is set to true , the app will trust all certificates. The value of this property is false by default.|true|
 
 The example above shows how to start the app bound to port 1234, using an oxd-https-extension located at `https://my.oxd-ext.org` and an OP located at `https://my.op-provider.com`.
 
