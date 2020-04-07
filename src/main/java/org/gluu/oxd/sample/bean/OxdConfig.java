@@ -28,20 +28,21 @@ import java.util.Properties;
 /**
  * A bean employed to store configuration parameters related to oxd:
  * <ul>
- *     <li>oxd-server (or oxd-https-extension) location</li>
- *     <li>Settings required to execute oxd-java API operations</li>
- *     <li>Output of the latest Site Registration attempt</li>
+ * <li>oxd-server (or oxd-https-extension) location</li>
+ * <li>Settings required to execute oxd-java API operations</li>
+ * <li>Output of the latest Site Registration attempt</li>
  * </ul>
+ *
  * @author jgomer
  */
 @Named
 @ApplicationScoped
 public class OxdConfig {
 
-    static final String URL_PREFIX="/oidc";
+    static final String URL_PREFIX = "/oidc";
 
-    private static final String TMP_DIR=System.getProperty("java.io.tmpdir");
-    private static final String TMP_FILE_NAME ="oxd-java-sample.conf";
+    private static final String TMP_DIR = System.getProperty("java.io.tmpdir");
+    private static final String TMP_FILE_NAME = "oxd-java-sample.conf";
 
     private ObjectMapper mapper;
     private Logger logger = LogManager.getLogger(getClass());
@@ -66,11 +67,11 @@ public class OxdConfig {
     private String clientId;
     private String clientSecret;
     private String clientName;
-
+    private boolean trustAllClient;
 
     @Override
-    public String toString(){
-        StringBuilder sb=new StringBuilder();
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
         sb.append("opHost=").append(opHost).append(", ")
                 .append("host=").append(host).append(", ")
                 .append("port=").append(port).append(", ");
@@ -80,11 +81,11 @@ public class OxdConfig {
     /**
      * Nullifies fields related to the openID client created when executing the Site Registration/Setup Client operation
      */
-    void resetClient(){
-        oxdId=null;
-        clientId=null;
-        clientSecret=null;
-        clientName=null;
+    void resetClient() {
+        oxdId = null;
+        clientId = null;
+        clientSecret = null;
+        clientName = null;
     }
 
     /**
@@ -92,24 +93,24 @@ public class OxdConfig {
      * enter the configs manually upon every restart.
      * Files is saved to operating system temporary directory.
      */
-    void store(){
+    void store() {
 
         try {
-            Map<String, Object> map=mapper.convertValue(this, new TypeReference<Object>(){});
-            Collection<String> params=Arrays.asList("opHost", "host", "port", "acrValues", "grantTypes", "scopes");
+            Map<String, Object> map = mapper.convertValue(this, new TypeReference<Object>() {
+            });
+            Collection<String> params = Arrays.asList("opHost", "host", "port", "acrValues", "grantTypes", "scopes");
             map.keySet().retainAll(params);
 
-            Properties props=new Properties();
+            Properties props = new Properties();
             params.forEach(prop -> {
-                if (map.get(prop)!=null)
+                if (map.get(prop) != null)
                     props.setProperty(prop, map.get(prop).toString());
             });
 
-            Path path=Paths.get(TMP_DIR, TMP_FILE_NAME);
+            Path path = Paths.get(TMP_DIR, TMP_FILE_NAME);
             logger.info("Saving oxd settings to {}", path.toString());
             props.store(Files.newOutputStream(path), "oxd-sample-java");
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
 
@@ -123,53 +124,51 @@ public class OxdConfig {
     @PostConstruct
     private void init() {
 
-        mapper=new ObjectMapper();
-        boolean fileParsed=false;
-        Path path=Paths.get(TMP_DIR, TMP_FILE_NAME);
+        mapper = new ObjectMapper();
+        boolean fileParsed = false;
+        Path path = Paths.get(TMP_DIR, TMP_FILE_NAME);
 
-        if (Files.exists(path) && System.getProperty("oxd.sample.skip-conf-file")==null){
-            Properties props=new Properties();
+        trustAllClient = System.getProperty("trust.all.client") != null ? Boolean.valueOf(System.getProperty("trust.all.client"))  : false;
+
+        if (Files.exists(path) && System.getProperty("oxd.sample.skip-conf-file") == null) {
+            Properties props = new Properties();
             try {
                 props.load(Files.newInputStream(path));
                 BeanUtils.populate(this, props);
-                fileParsed=true;
-            }
-            catch (Exception e){
+                fileParsed = true;
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
         }
 
-        if (!fileParsed){
-            opHost=System.getProperty("oxd.server.op-host", null);
-            host=System.getProperty("oxd.server.host", "localhost");
-
-            String _port=System.getProperty("oxd.server.port");
-            try{
-                port=Integer.parseInt(_port);
-            }
-            catch (Exception e){
-                port=8443;
+        if (!fileParsed) {
+            opHost = System.getProperty("oxd.server.op-host", null);
+            host = System.getProperty("oxd.server.host", "localhost");
+            String _port = System.getProperty("oxd.server.port");
+            try {
+                port = Integer.parseInt(_port);
+            } catch (Exception e) {
+                port = 8443;
                 logger.warn("Defaulting oxd port to {}", port);
             }
-
             //useHttpsExtension=System.getProperty("oxd.server.is-https")!=null;
-            acrValues=System.getProperty("oxd.server.acr-values", "auth_ldap_server");
-            scopes=System.getProperty("oxd.server.scopes", "openid uma_protection");
-            grantTypes=System.getProperty("oxd.server.grant-types", "authorization_code client_credentials");
+            acrValues = System.getProperty("oxd.server.acr-values", "auth_ldap_server");
+            scopes = System.getProperty("oxd.server.scopes", "openid uma_protection");
+            grantTypes = System.getProperty("oxd.server.grant-types", "authorization_code client_credentials");
         }
 
-        String uri=getServerRoot() + context.getContextPath();
+        String uri = getServerRoot() + context.getContextPath();
         setRedirectUri(uri + URL_PREFIX + "/tokens.xhtml");
         setPostLogoutUri(uri + URL_PREFIX + "/post-logout.xhtml");
 
     }
 
-    public static String getServerRoot(){
+    public static String getServerRoot() {
 
-        StringBuilder uri=new StringBuilder();
-        uri.append("https://").append(System.getProperty("oxd.sample.host","localhost"));
+        StringBuilder uri = new StringBuilder();
+        uri.append("https://").append(System.getProperty("oxd.sample.host", "localhost"));
 
-        String serverPort=System.getProperty("oxd.sample.port","8463");
+        String serverPort = System.getProperty("oxd.sample.port", "8463");
 
         if (!serverPort.equals("443"))
             uri.append(":").append(serverPort);
@@ -274,4 +273,11 @@ public class OxdConfig {
         this.scopes = scopes;
     }
 
+    public boolean isTrustAllClient() {
+        return trustAllClient;
+    }
+
+    public void setTrustAllClient(boolean trustAllClient) {
+        this.trustAllClient = trustAllClient;
+    }
 }
