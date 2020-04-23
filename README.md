@@ -4,7 +4,7 @@ A web application that demostrates how to use oxd-java library to perform user a
 
 This demo app uses basic well-known technologies part of the Java EE 7 web profile. We strove for not using additional frameworks in order to facilitate the understanding of project structure as well as its code.
 
-**Note**: At Gluu, we already have an oxd-java sample app that leverages the [spring framework](https://gluu.org/docs/oxd/3.1.1/libraries/framework/spring/) that might be of your interest.
+**Note**: At Gluu, we already have an oxd-java sample app that leverages the [spring framework](https://www.gluu.org/docs/oxd/tutorials/spring/) that might be of your interest.
 
 Having this application up and running is very straightforward. You don't have to go through an endless list of steps for installation and configuration. Once the [prereq](#requisites) software is installed, you are almost done.
 
@@ -12,19 +12,13 @@ Having this application up and running is very straightforward. You don't have t
 
 1. Java 8+
 
-Install [Java Standard Edition](http://www.oracle.com/technetwork/java/javase/downloads/2133151) version 8 or higher.
+    Install [Java Standard Edition](http://www.oracle.com/technetwork/java/javase/downloads/2133151) version 8 or higher.
 
 2. Maven 3+
 
-Download [maven](https://maven.apache.org/download.cgi) and follow the simple installation instructions. Ensure the `bin` directory is added to your PATH.
+    Download [maven](https://maven.apache.org/download.cgi) and follow the simple installation instructions. Ensure the `bin` directory is added to your PATH.
 
-3. An OpenID Connect Provider (OP), like the Gluu Server
-
-Learn how to download and install Gluu server by visiting this [page](https://gluu.org/docs/ce/installation-guide/).
-
-4. oxd-server - 4.0
-
-Download and install [oxd-server 4.0](https://gluu.org/docs/oxd/4.0/). For the purposes of this demo app, built-in default configuration files will work.
+3. Install [Gluu Server bundled with oxd](https://www.gluu.org/docs/oxd/install/).
 
 ## Run
 
