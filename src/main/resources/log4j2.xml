@@ -6,7 +6,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="org.xdi.oxd.sample" level="TRACE" additivity="false">
+        <Logger name="org.gluu.oxd.sample" level="TRACE" additivity="false">
             <AppenderRef ref="Console" />
         </Logger>
     </Loggers>

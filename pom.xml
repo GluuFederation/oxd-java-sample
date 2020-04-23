@@ -3,10 +3,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.xdi</groupId>
+    <groupId>org.gluu</groupId>
     <artifactId>oxd-java-sample</artifactId>
     <packaging>war</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
 
     <name>oxd-java-sample webapp</name>
     <url>http://www.gluu.org</url>
@@ -22,7 +22,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <oxd.version>3.1.1.Final</oxd.version>
+        <oxd.version>4.0-SNAPSHOT</oxd.version>
         <jetty.version>9.4.2.v20170220</jetty.version>
     </properties>
 
@@ -31,12 +31,12 @@
         <!-- Gluu's oxd -->
         <dependency>
             <artifactId>oxd-common</artifactId>
-            <groupId>org.xdi</groupId>
+            <groupId>org.gluu</groupId>
             <version>${oxd.version}</version>
         </dependency>
         <dependency>
             <artifactId>oxd-client</artifactId>
-            <groupId>org.xdi</groupId>
+            <groupId>org.gluu</groupId>
             <version>${oxd.version}</version>
         </dependency>
 
