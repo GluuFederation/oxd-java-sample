@@ -100,7 +100,6 @@ public class OxdService {
         params.setPostLogoutRedirectUris(Lists.newArrayList(config.getPostLogoutUri().split(" ")));
         params.setRedirectUris(Lists.newArrayList(config.getRedirectUri().split(" ")));
         params.setScope(Lists.newArrayList(config.getScopes().split(" ")));
-        params.setTrustedClient(true);
         params.setGrantTypes(Lists.newArrayList(config.getGrantTypes().split(" ")));
         params.setClientName(config.getClientName());
         //params.setResponseTypes(Lists.newArrayList("code"));
@@ -128,7 +127,7 @@ public class OxdService {
         cmdParams.setAcrValues(Lists.newArrayList(config.getAcrValues().split(" ")));
         cmdParams.setScope(Lists.newArrayList(config.getScopes().split(" ")));
 
-        final GetAuthorizationUrlResponse resp = clientInterface.getAuthorizationUrl(getClientToken(clientInterface), cmdParams);
+        final GetAuthorizationUrlResponse resp = clientInterface.getAuthorizationUrl(getClientToken(clientInterface), null, cmdParams);
 
         return resp.getAuthorizationUrl();
 
@@ -151,7 +150,7 @@ public class OxdService {
         cmdParams.setCode(code);
         cmdParams.setState(state);
 
-        GetTokensByCodeResponse2 resp = clientInterface.getTokenByCode(getClientToken(clientInterface), cmdParams);
+        GetTokensByCodeResponse2 resp = clientInterface.getTokenByCode(getClientToken(clientInterface), null, cmdParams);
         return resp;
     }
 
@@ -169,7 +168,7 @@ public class OxdService {
         GetUserInfoParams cmdParams = new GetUserInfoParams();
         cmdParams.setOxdId(config.getOxdId());
         cmdParams.setAccessToken(accessToken);
-        JsonNode resp = clientInterface.getUserInfo(getClientToken(clientInterface), cmdParams);
+        JsonNode resp = clientInterface.getUserInfo(getClientToken(clientInterface), null, cmdParams);
 
         return resp;
 
@@ -192,7 +191,7 @@ public class OxdService {
         params.setState(UUID.randomUUID().toString());
         params.setSessionState(UUID.randomUUID().toString()); // here must be real session instead of dummy UUID
 
-        final GetLogoutUriResponse resp = clientInterface.getLogoutUri(getClientToken(clientInterface), params);
+        final GetLogoutUriResponse resp = clientInterface.getLogoutUri(getClientToken(clientInterface), null, params);
 
         return resp.getUri();
 

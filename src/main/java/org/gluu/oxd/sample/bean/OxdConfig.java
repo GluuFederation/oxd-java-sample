@@ -96,7 +96,7 @@ public class OxdConfig {
     void store() {
 
         try {
-            Map<String, Object> map = mapper.convertValue(this, new TypeReference<Object>() {
+            Map<String, Object> map = (Map<String, Object>) mapper.convertValue(this, new TypeReference<Object>() {
             });
             Collection<String> params = Arrays.asList("opHost", "host", "port", "acrValues", "grantTypes", "scopes");
             map.keySet().retainAll(params);
@@ -153,7 +153,7 @@ public class OxdConfig {
             }
             //useHttpsExtension=System.getProperty("oxd.server.is-https")!=null;
             acrValues = System.getProperty("oxd.server.acr-values", "auth_ldap_server");
-            scopes = System.getProperty("oxd.server.scopes", "openid uma_protection");
+            scopes = System.getProperty("oxd.server.scopes", "openid uma_protection oxd");
             grantTypes = System.getProperty("oxd.server.grant-types", "authorization_code client_credentials");
         }
 
