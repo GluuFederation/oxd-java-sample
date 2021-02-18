@@ -134,7 +134,8 @@ public class OxdConfig {
             Properties props = new Properties();
             try {
                 props.load(Files.newInputStream(path));
-                BeanUtils.populate(this, props);
+                Map<String,String> mapprops = (Map)props;
+	            BeanUtils.populate(this, mapprops);
                 fileParsed = true;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
